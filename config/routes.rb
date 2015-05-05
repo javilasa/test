@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   end
  
   root 'welcome#index'
+  
+  get '/home', to: 'pages#home'
 
  
 end
