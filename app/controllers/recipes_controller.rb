@@ -2,7 +2,9 @@ class RecipesController < ApplicationController
     
     before_action :set_recipe, only: [:edit, :update, :show, :like]
     before_action :require_user, except:[:show, :index]
+    before_action :require_user_like, only: [:like]
     before_action :require_same_user, only: [:edit, :update]
+    
     
     def index
         @recipes= Recipe.paginate(page: params[:page], per_page: 4)
@@ -39,7 +41,7 @@ class RecipesController < ApplicationController
         
         if @recipe.update(recipe_params)
            flash[:success]= "Your recipe was update succesfully!"
-           redirect_to chef_path(@chef)
+           redirect_to chef_path(@recipe)
         else
             render :edit
         end
@@ -60,7 +62,7 @@ class RecipesController < ApplicationController
     private
     
         def recipe_params
-            params.require(:recipe).permit(:name, :summary, :description, :picture)
+            params.require(:recipe).permit(:name, :summary, :description, :picture, style_ids:[], ingredient_ids:[])
         end
 
     def require_same_user
@@ -73,5 +75,12 @@ class RecipesController < ApplicationController
     def set_recipe
         @recipe=Recipe.find(params[:id])
     end        
+    
+    def require_user_like
+        if !logged_in?
+            flash[:danger] ="You must be logged in to perform that action"
+            redirect_to :back
+        end
+    end    
     
 end
